@@ -1,0 +1,1 @@
+﻿ffmpeg -y -i "{input}.*" -vn -acodec libmp3lame -b:a 128k -ar 44100 -bufsize 50000k -f mp3 -preset superfast "{output}.mp3"

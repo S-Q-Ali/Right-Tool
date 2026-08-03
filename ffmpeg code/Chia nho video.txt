@@ -1,0 +1,3 @@
+ffmpeg -i "{input}.*" -c copy -map 0 -segment_time 03:00 -f segment "{output}_Part_%02d.mp4"
+
+//Change time here: 03:00
