@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using YoutubeZenniTool;
@@ -783,14 +784,43 @@ public class MainForm : Form
 
 	private void RenderSingleItem(int _003F85_003F)
 	{
-		string text = _ffmpegHelper.StripComments(File.ReadAllText(".\\ffmpeg code\\"+ cbbFfmpegCode.SelectedItem.ToString()));
+		string text = _ffmpegHelper.StripComments(File.ReadAllText(Path.Combine(_ffmpegHelper.GetFfmpegCodeDir(), cbbFfmpegCode.SelectedItem.ToString())));
 		string text2 = "";
 		text2 = ((!text.Contains("{output}.*")) ? ("\""+ txtOutputRender.Text + "\\"+ Path.GetFileNameWithoutExtension(dgvRender.Rows[_003F85_003F].Cells[0].Value.ToString())) : ("\""+ txtOutputRender.Text + "\\"+ Path.GetFileName(dgvRender.Rows[_003F85_003F].Cells[0].Value.ToString())));
 		dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.Yellow;
 		dgvRender.Rows[_003F85_003F].Cells[1].Value = "Processing...";
-		RunFfmpegCommand(cbHideFfmpeg.Checked, _003F85_003F, text2, "/c");
-		dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.LimeGreen;
-		dgvRender.Rows[_003F85_003F].Cells[1].Value = "Render Completed";
+		try
+		{
+			if (!string.IsNullOrEmpty(txtOutputRender.Text))
+			{
+				Directory.CreateDirectory(txtOutputRender.Text);
+			}
+		}
+		catch (Exception ex)
+		{
+			dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.Red;
+			dgvRender.Rows[_003F85_003F].Cells[1].Value = "Failed";
+			MessageBox.Show(ex.Message, "Output folder error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+			return;
+		}
+		CommandResult commandResult = RunFfmpegCommand(cbHideFfmpeg.Checked, _003F85_003F, text2, "/c");
+		if (commandResult.ExitCode == 0)
+		{
+			dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.LimeGreen;
+			dgvRender.Rows[_003F85_003F].Cells[1].Value = "Render Completed";
+		}
+		else
+		{
+			string[] errorLines = commandResult.Error.Replace("\r\n", "\n").Split('\n');
+			string shortError = string.Join(Environment.NewLine, errorLines.Skip(Math.Max(0, errorLines.Length - 5)));
+			if (string.IsNullOrWhiteSpace(shortError))
+			{
+				shortError = "Unknown error (exit code " + commandResult.ExitCode + ")";
+			}
+			dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.Red;
+			dgvRender.Rows[_003F85_003F].Cells[1].Value = "Failed";
+			MessageBox.Show(shortError, "FFmpeg error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+		}
 	}
 
 	private void MainForm_Load(object _003F82_003F, EventArgs _003F83_003F)
@@ -800,7 +830,7 @@ public class MainForm : Form
 	private void BtnEditCode_Click(object _003F82_003F, EventArgs _003F83_003F)
 	{
 		string text = cbbFfmpegCode.SelectedItem.ToString();
-		EditFfmpegCodeForm editCodeForm = new EditFfmpegCodeForm(".\\ffmpeg code\\"+ text);
+		EditFfmpegCodeForm editCodeForm = new EditFfmpegCodeForm(Path.Combine(_ffmpegHelper.GetFfmpegCodeDir(), text));
 		editCodeForm.Show();
 	}
 
@@ -821,9 +851,9 @@ public class MainForm : Form
 		}
 	}
 
-	private void RunFfmpegCommand(bool _003F86_003F, int _003F87_003F, string _003F88_003F, string _003F89_003F)
+	private CommandResult RunFfmpegCommand(bool _003F86_003F, int _003F87_003F, string _003F88_003F, string _003F89_003F)
 	{
-		string text = _ffmpegHelper.StripComments(File.ReadAllText(".\\ffmpeg code\\"+ cbbFfmpegCode.SelectedItem.ToString()));
+		string text = _ffmpegHelper.StripComments(File.ReadAllText(Path.Combine(_ffmpegHelper.GetFfmpegCodeDir(), cbbFfmpegCode.SelectedItem.ToString())));
 		if (text.Contains("{input}.*"))
 		{
 			text = text.Replace("{input}.*", dgvRender.Rows[_003F87_003F].Cells[0].Value.ToString());
@@ -844,9 +874,13 @@ public class MainForm : Form
 		}
 		else
 		{
-			text = text.Replace("\"{output}", _003F88_003F + "\"");
+			string basePath = _003F88_003F.Substring(1);
+			text = Regex.Replace(text, "\"\\{output\\}(?<suffix>[^\"]*)\"", delegate(Match match)
+			{
+				return "\"" + basePath + match.Groups["suffix"].Value + "\"";
+			});
 		}
-		_ffmpegHelper.RunCommand(_003F86_003F, text, _003F89_003F);
+		return _ffmpegHelper.RunCommand(_003F86_003F, text, _003F89_003F);
 	}
 
 	private void CbbAddVideoInput_SelectedIndexChanged(object _003F82_003F, EventArgs _003F83_003F)

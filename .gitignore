@@ -21,3 +21,9 @@ obj/
 *.mp3
 *.bat
 *.wav
+
+# Bundled sample media used by the FFmpeg presets (keep in git)
+!videoBG.mp4
+!full.mp4
+!longtieng.mp4
+!longtieng2.mp4

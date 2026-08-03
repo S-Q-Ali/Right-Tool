@@ -68,7 +68,16 @@ bin\
   youtube-dl.exe
 ffmpeg code\
   *.txt            <- command presets (loaded into the "FFmpeg code" combo box)
+videoBG.mp4        <- background clip used by the "Shrink Copyright Bypass" preset
+FIL2.png           <- filter PNG used by the "Shrink Copyright Bypass" preset
+conan2.png         <- filter used by the "Demo Code - Shrink Video" preset
+longtieng2.mp4     <- background clip used by the "Demo Code - Shrink Video" preset
 ```
+
+> The media files above ship with the repo (in the project root). Presets that
+> reference files *not* bundled (e.g. `intro.mp4`, `outro.mp4`, `Logo.png`,
+> `audio.wav`, `E:\Render\...`) expect you to provide them in the working
+> directory yourself.
 
 ## Presets
 
@@ -87,6 +96,11 @@ ffmpeg -ss 10 -i "{input}.*" -vcodec copy -acodec copy "{output}.mp4"
 Some presets reference extra media files (e.g. `intro.mp4`, `logo.png`,
 `audio.wav`) that must exist in the working directory — see each preset's
 comments. Output files are written to the folder chosen in the "Output" box.
+
+> If FFmpeg fails (e.g. a referenced media file is missing), the row turns red
+> with **"Failed"** and a dialog shows the last FFmpeg error lines, e.g.
+> `FIL2.png: No such file or directory`. The chosen output folder is created
+> automatically if it doesn't exist yet.
 
 ## Project structure
 
