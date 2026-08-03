@@ -116,7 +116,7 @@ public class EditFfmpegCodeForm : Form
 		base.Controls.Add(btnSaveAs);
 		base.Controls.Add(mainCode);
 		base.FormBorderStyle = FormBorderStyle.FixedSingle;
-		base.Icon = (Icon)componentResourceManager.GetObject("$this.Icon");
+		base.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 		base.Name = "EditFfmpegCode";
 		Text = "Edit Ffmpeg Code";
 		base.Load += EditFfmpegCodeForm_Load;

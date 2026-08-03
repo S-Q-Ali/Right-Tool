@@ -1448,7 +1448,7 @@ public class MainForm : Form
 		base.ClientSize = new Size(795, 537);
 		base.Controls.Add(tabControl);
 		base.FormBorderStyle = FormBorderStyle.FixedSingle;
-		base.Icon = (Icon)componentResourceManager.GetObject("$this.Icon");
+		base.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 		base.MaximizeBox = false;
 		base.Name = "MainForm";
 		Text = "Youtube Zenni Tool (Open Source)";

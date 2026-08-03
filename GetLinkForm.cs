@@ -155,7 +155,7 @@ public class GetLinkForm : Form
 		base.Controls.Add(btnCopy);
 		base.Controls.Add(txtOutput);
 		base.FormBorderStyle = FormBorderStyle.FixedSingle;
-		base.Icon = (Icon)componentResourceManager.GetObject("$this.Icon");
+		base.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 		base.Name = "GetLink";
 		Text = "Get Link for Input";
 		base.Load += GetLinkForm_Load;
