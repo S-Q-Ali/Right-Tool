@@ -27,21 +27,21 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="richTextBox1.Text" xml:space="preserve"><value>Live stream từ link youtube, link trực tiếp trên youtube, link m3u8, twitch, facebook, dailymotion,... mà không cần get link
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="richTextBox1.Text" xml:space="preserve"><value>Live stream from a YouTube link, direct link on YouTube, m3u8 link, Twitch, Facebook, Dailymotion,... without needing to get the link
 
-Hướng dẫn cơ bản:
-Nhấp vào Loop Infinitive nếu muốn live stream lặp lại liên tục
-Nếu live stream mà giật, lag hoặc tốc độ stream không đủ 1x, thì nhấp vào non filter để giải quyết được phần nào.
+Basic guide:
+Click Loop Infinitive if you want the live stream to loop continuously
+If the live stream is stuttering, lagging, or the stream speed is not enough 1x, click non filter to fix some of it.
 
-Trường hợp khi live từ link bị lỗi mở lên tắt luôn, thì sử dụng chức năng "Get Link!" ở phía trên Input. Sau đó chỉ việc Paste link get được vào Input là giải quyết được vấn đề.
+If live streaming from a link fails (it opens then closes immediately), use the "Get Link!" function above the Input. Then just paste the link you got into the Input to solve the problem.
 
-Trường hợp tool không tự động get link hoặc get link lỗi, vui lòng cập nhật bản youtube-dl mới nhất tại: "http://youtube-dl.org" sau đó thay thế bản youtube-dl cũ đã có trong tool.
+If the tool does not automatically get the link or get link fails, please update the latest youtube-dl version at: "http://youtube-dl.org" then replace the old youtube-dl version in the tool.
 
-Chỉ chọn "Fix Non Filter" khi nhấp vào Non Filter mà chương trình không chạy được.
+Only choose "Fix Non Filter" when clicking Non Filter and the program does not run.
 
-Báo lỗi thiếu MSVCR100.dll thì cài thêm: 
+If you get a missing MSVCR100.dll error, install:
 https://www.microsoft.com/en-US/download/details.aspx?id=5555
 
-Cài thêm .NET 4.7 để đảm bảo tool hoạt động trơn tru
+Install .NET 4.7 to ensure the tool runs smoothly
 https://www.microsoft.com/en-us/download/details.aspx?id=55167</value></data>
   </root>

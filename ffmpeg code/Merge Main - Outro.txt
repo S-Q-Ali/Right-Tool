@@ -1,0 +1,3 @@
+//outro.mp4 - path to the outro file
+//Merge main - outro
+ffmpeg -y -i "outro.mp4" -i "{input}.*" -filter_complex "[1:v]scale=1280:720,setdar=16/9 [vmain]; [1:a]volume=1.6 [amain]; [0:v]scale=1280:720,setdar=16/9 [voutro]; [vmain][amain][voutro][0:a]concat=n=2:v=1:a=1" -vcodec libx264 -pix_fmt yuv420p -r 30 -g 60 -b:v 1400k -profile:v main -level 3.1 -acodec libmp3lame -b:a 128k -ar 44100 -preset superfast "{output}_outro.mp4"

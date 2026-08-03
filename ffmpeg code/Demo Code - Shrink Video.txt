@@ -1,0 +1,6 @@
+//conan2.png - video filter, layered on top
+//longtieng2.mp4 - video background for the video
+//change video size: [0:v]scale=800x450
+//change video position: [bg][v]overlay=shortest=1:x=32:y=242
+
+ffmpeg -y -i "{input}.mp4" -i "conan2.png" -filter_complex "[0:v]scale=800x450,setpts=PTS/1.1,boxblur=0.2 [v]; movie=longtieng2.mp4:loop=999,setpts=N/(FRAME_RATE*TB) [bg]; [bg][v]overlay=shortest=1:x=32:y=242 [v1]; [v1][1:v]overlay=0:0; [0:a]atempo=1.1,bass=frequency=110:gain=-50,volume=+24dB,aecho=0.4:0.66:2:0.2,bass=g=3:f=110:w=1,bass=g=3:f=110:w=2,bass=g=3:f=110:w=3,bass=g=3:f=110:w=4,bass=g=3:f=110:w=5,firequalizer=gain_entry='entry(0,-23);entry(250,-11.5);entry(1000,0);entry(4000,8);entry(16000,16)',compand=attacks=.05:decays=.05:points=-90/-90 -70/-90 -15/-15 0/-10:soft-knee=6:volume=-70:gain=3,pan=stereo| FL < FL + 0.5*FC + 0.6*BL + 0.6*SL | FR < FR + 0.5*FC + 0.6*BR + 0.6*SR,highpass=f=300,lowpass=f=1500,volume=1.5,chorus=0.2:0.4:20|20:0.4|0.12:0.12|0.4:2|1.2" -vcodec libx264 -pix_fmt yuv420p -r 30 -g 60 -b:v 1000k -acodec libmp3lame -b:a 128k -ar 44100 -preset superfast "{output}.mp4"
