@@ -78,6 +78,11 @@ longtieng2.mp4     <- background clip used by the "Demo Code - Shrink Video" pre
 > reference files *not* bundled (e.g. `intro.mp4`, `outro.mp4`, `Logo.png`,
 > `audio.wav`, `E:\Render\...`) expect you to provide them in the working
 > directory yourself.
+>
+> The bundled media is clean: promotional/background clips and filter images
+> (`videoBG.mp4`, `FIL2.png`, `longtieng2.mp4`, `conan2.png`) contain only
+> generic phrases (e.g. "Please like and subscribe") and no third-party
+> links, URLs, channel names, or author credits.
 
 ## Presets
 
