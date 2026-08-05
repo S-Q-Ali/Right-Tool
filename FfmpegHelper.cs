@@ -49,7 +49,7 @@ internal class FfmpegHelper
 		return Regex.Replace(_003F91_003F, pattern, "$1");
 	}
 
-	public CommandResult RunCommand(bool _003F86_003F, string _003F91_003F, string _003F89_003F)
+	public CommandResult RunCommand(bool _003F86_003F, string _003F91_003F, string _003F89_003F, Action<string> onLogLine = null)
 	{
 		_003F91_003F = _003F91_003F.Replace("ffmpeg", GetFfmpegBinPath() + "ffmpeg");
 		_003F91_003F = _003F91_003F.Replace("ffplay", GetFfmpegBinPath() + "ffplay");
@@ -61,25 +61,40 @@ internal class FfmpegHelper
 			processStartInfo.CreateNoWindow = _003F86_003F;
 			processStartInfo.FileName = "cmd.exe";
 			processStartInfo.Arguments = _003F89_003F + " " + _003F91_003F;
-			processStartInfo.RedirectStandardError = true;
-			processStartInfo.RedirectStandardOutput = true;
 			processStartInfo.UseShellExecute = false;
+			if (_003F86_003F)
+			{
+				processStartInfo.RedirectStandardError = true;
+				processStartInfo.RedirectStandardOutput = true;
+			}
 			process.StartInfo = processStartInfo;
 			process.Start();
 
-			StringBuilder errorBuilder = new StringBuilder();
-			process.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+			if (!_003F86_003F)
 			{
-				if (e.Data != null)
+				process.WaitForExit();
+				result.ExitCode = process.ExitCode;
+			}
+			else
+			{
+				StringBuilder errorBuilder = new StringBuilder();
+				process.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
 				{
-					errorBuilder.AppendLine(e.Data);
-				}
-			};
-			process.BeginErrorReadLine();
-			result.Output = process.StandardOutput.ReadToEnd();
-			process.WaitForExit();
-			result.ExitCode = process.ExitCode;
-			result.Error = errorBuilder.ToString();
+					if (e.Data != null)
+					{
+						errorBuilder.AppendLine(e.Data);
+						if (onLogLine != null)
+						{
+							onLogLine(e.Data);
+						}
+					}
+				};
+				process.BeginErrorReadLine();
+				result.Output = process.StandardOutput.ReadToEnd();
+				process.WaitForExit();
+				result.ExitCode = process.ExitCode;
+				result.Error = errorBuilder.ToString();
+			}
 		}
 		catch (Exception ex)
 		{

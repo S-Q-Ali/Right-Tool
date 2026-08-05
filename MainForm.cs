@@ -163,6 +163,8 @@ public class MainForm : Form
 
 	private NumericUpDown numThread;
 
+	private TextBox txtLiveLog;
+
 	public MainForm()
 	{
 		InitializeComponent();
@@ -752,6 +754,10 @@ public class MainForm : Form
 	{
 		if (!_renderThread.IsAlive)
 		{
+			if (txtLiveLog != null)
+			{
+				txtLiveLog.Clear();
+			}
 			_renderThread = new Thread((ThreadStart)delegate
 			{
 				_003F13_003F CS_0024_003C_003E8__locals5 = new _003F13_003F();
@@ -803,7 +809,7 @@ public class MainForm : Form
 			MessageBox.Show(ex.Message, "Output folder error", MessageBoxButtons.OK, MessageBoxIcon.Hand);
 			return;
 		}
-		CommandResult commandResult = RunFfmpegCommand(cbHideFfmpeg.Checked, _003F85_003F, text2, "/c");
+		CommandResult commandResult = RunFfmpegCommand(cbHideFfmpeg.Checked, _003F85_003F, text2, cbHideFfmpeg.Checked ? "/c" : "/k", AppendLogLine);
 		if (commandResult.ExitCode == 0)
 		{
 			dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.LimeGreen;
@@ -815,7 +821,7 @@ public class MainForm : Form
 			string shortError = string.Join(Environment.NewLine, errorLines.Skip(Math.Max(0, errorLines.Length - 5)));
 			if (string.IsNullOrWhiteSpace(shortError))
 			{
-				shortError = "Unknown error (exit code " + commandResult.ExitCode + ")";
+				shortError = "Process exited with code " + commandResult.ExitCode + " - see the cmd window / Live Log for details";
 			}
 			dgvRender.Rows[_003F85_003F].DefaultCellStyle.BackColor = Color.Red;
 			dgvRender.Rows[_003F85_003F].Cells[1].Value = "Failed";
@@ -845,13 +851,13 @@ public class MainForm : Form
 			_renderThread = new Thread((ThreadStart)delegate
 			{
 				int rowIndex = dgvRender.CurrentCell.RowIndex;
-				RunFfmpegCommand(_003F86_003F: false, rowIndex, "-f matroska - | ffplay -", "/k");
+				RunFfmpegCommand(_003F86_003F: false, rowIndex, "-f matroska - | ffplay -", "/k", AppendLogLine);
 			});
 			_renderThread.Start();
 		}
 	}
 
-	private CommandResult RunFfmpegCommand(bool _003F86_003F, int _003F87_003F, string _003F88_003F, string _003F89_003F)
+	private CommandResult RunFfmpegCommand(bool _003F86_003F, int _003F87_003F, string _003F88_003F, string _003F89_003F, Action<string> onLogLine = null)
 	{
 		string text = _ffmpegHelper.StripComments(File.ReadAllText(Path.Combine(_ffmpegHelper.GetFfmpegCodeDir(), cbbFfmpegCode.SelectedItem.ToString())));
 		if (text.Contains("{input}.*"))
@@ -880,7 +886,25 @@ public class MainForm : Form
 				return "\"" + basePath + match.Groups["suffix"].Value + "\"";
 			});
 		}
-		return _ffmpegHelper.RunCommand(_003F86_003F, text, _003F89_003F);
+		return _ffmpegHelper.RunCommand(_003F86_003F, text, _003F89_003F, onLogLine);
+	}
+
+	private void AppendLogLine(string line)
+	{
+		if (!IsHandleCreated || txtLiveLog == null)
+		{
+			return;
+		}
+		BeginInvoke((Action)delegate
+		{
+			txtLiveLog.AppendText(line + Environment.NewLine);
+			if (txtLiveLog.TextLength > 100000)
+			{
+				txtLiveLog.Clear();
+			}
+			txtLiveLog.SelectionStart = txtLiveLog.TextLength;
+			txtLiveLog.ScrollToCaret();
+		});
 	}
 
 	private void CbbAddVideoInput_SelectedIndexChanged(object _003F82_003F, EventArgs _003F83_003F)
@@ -931,6 +955,7 @@ public class MainForm : Form
 		btnDelete = new Button();
 		cbbFfmpegCode = new ComboBox();
 		lblFfmpegCode = new Label();
+		txtLiveLog = new TextBox();
 		tabLiveStream = new TabPage();
 		rtbInstructions = new RichTextBox();
 		btLiveStop = new Button();
@@ -996,6 +1021,7 @@ public class MainForm : Form
 		tabRender.Controls.Add(dgvRender);
 		tabRender.Controls.Add(grpRenderSettings);
 		tabRender.Controls.Add(grpCodeEditor);
+		tabRender.Controls.Add(txtLiveLog);
 		tabRender.Location = new Point(4, 25);
 		tabRender.Name = "tabPage1";
 		tabRender.Padding = new Padding(3);
@@ -1008,7 +1034,7 @@ public class MainForm : Form
 		dgvRender.Columns.AddRange(colVideoInput, colStatus);
 		dgvRender.Location = new Point(6, 109);
 		dgvRender.Name = "dgvRender";
-		dgvRender.Size = new Size(777, 400);
+		dgvRender.Size = new Size(777, 330);
 		dgvRender.TabIndex = 2;
 		colVideoInput.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 		colVideoInput.HeaderText = "Video Input";
@@ -1019,6 +1045,14 @@ public class MainForm : Form
 		colStatus.Name = "Column2";
 		colStatus.ReadOnly = true;
 		colStatus.Width = 150;
+		txtLiveLog.Location = new Point(6, 441);
+		txtLiveLog.Multiline = true;
+		txtLiveLog.Name = "txtLiveLog";
+		txtLiveLog.ReadOnly = true;
+		txtLiveLog.ScrollBars = ScrollBars.Vertical;
+		txtLiveLog.Size = new Size(777, 72);
+		txtLiveLog.TabIndex = 10;
+		txtLiveLog.WordWrap = false;
 		grpRenderSettings.Controls.Add(cbbAddVideoInput);
 		grpRenderSettings.Controls.Add(lblRenderInput);
 		grpRenderSettings.Controls.Add(btnStop);

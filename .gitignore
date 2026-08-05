@@ -12,6 +12,9 @@ obj/
 # Dependency staging
 .deps-tmp/
 
+# Packaged distribution output
+dist/
+
 # Logs
 *.log
 *.tmp
